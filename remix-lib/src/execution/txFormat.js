@@ -212,8 +212,7 @@ module.exports = {
           if (err) {
             callback('Error deploying required libraries: ' + err)
           } else {
-            bytecodeToDeploy = bytecode + dataHex
-            return callback(null, {dataHex: bytecodeToDeploy, funAbi, funArgs, contractBytecode, contractName: contractName})
+            return callback(null, {dataHex: bytecode + dataHex, funAbi, funArgs, contractBytecode, contractName: contractName})
           }
         }, callbackStep, callbackDeployLibrary)
         return
@@ -229,6 +228,7 @@ module.exports = {
   atAddress: function () {},
 
   linkBytecodeStandard: function (contract, contracts, callback, callbackStep, callbackDeployLibrary) {
+    var contractBytecode = ''
     asyncJS.eachOfSeries(contract.evm.bytecode.linkReferences, (libs, file, cbFile) => {
       asyncJS.eachOfSeries(contract.evm.bytecode.linkReferences[file], (libRef, libName, cbLibDeployed) => {
         var library = contracts[file][libName]
@@ -241,7 +241,7 @@ module.exports = {
             if (hexAddress.slice(0, 2) === '0x') {
               hexAddress = hexAddress.slice(2)
             }
-            contract.evm.bytecode.object = this.linkLibraryStandard(libName, hexAddress, contract)
+            contractBytecode = this.linkLibraryStandard(libName, hexAddress, contract)
             cbLibDeployed()
           }, callbackStep, callbackDeployLibrary)
         } else {
@@ -254,7 +254,7 @@ module.exports = {
       if (error) {
         callbackStep(error)
       }
-      callback(error, contract.evm.bytecode.object)
+      callback(error, contractBytecode)
     })
   },
 
