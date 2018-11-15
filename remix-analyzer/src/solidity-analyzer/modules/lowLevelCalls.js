@@ -11,6 +11,8 @@ function lowLevelCalls () {
 lowLevelCalls.prototype.visit = function (node) {
   if (common.isLowLevelCallInst(node)) {
     this.llcNodes.push({node: node, type: common.lowLevelCallTypes.CALL})
+  } else if (common.isLowLevelPayableCallInst(node)) {
+    this.llcNodes.push({node: node, type: common.lowLevelCallTypes.CALL})
   } else if (common.isLowLevelCallcodeInst(node)) {
     this.llcNodes.push({node: node, type: common.lowLevelCallTypes.CALLCODE})
   } else if (common.isLowLevelDelegatecallInst(node)) {

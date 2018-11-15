@@ -33,6 +33,7 @@ var basicTypes = {
   UINT: 'uint256',
   BOOL: 'bool',
   ADDRESS: 'address',
+  PAYABLE_ADDRESS: 'address payable',
   BYTES32: 'bytes32',
   STRING_MEM: 'string memory',
   BYTES_MEM: 'bytes memory',
@@ -65,6 +66,7 @@ var builtinFunctions = {
   'addmod(uint256,uint256,uint256)': true,
   'mulmod(uint256,uint256,uint256)': true,
   'selfdestruct(address)': true,
+  'selfdestruct(address payable)': true,
   'revert()': true,
   'revert(string memory)': true,
   'assert(bool)': true,
@@ -844,7 +846,7 @@ function isLowLevelCall (node) {
 function isLLSend (node) {
   return isMemberAccess(node,
           exactMatch(util.escapeRegExp(lowLevelCallTypes.SEND.type)),
-          undefined, exactMatch(basicTypes.ADDRESS), exactMatch(lowLevelCallTypes.SEND.ident))
+          undefined, exactMatch(basicTypes.PAYABLE_ADDRESS), exactMatch(lowLevelCallTypes.SEND.ident))
 }
 
 /**
@@ -856,6 +858,17 @@ function isLLCall (node) {
   return isMemberAccess(node,
           exactMatch(util.escapeRegExp(lowLevelCallTypes.CALL.type)),
           undefined, exactMatch(basicTypes.ADDRESS), exactMatch(lowLevelCallTypes.CALL.ident))
+}
+
+/**
+ * True if low level payable call
+ * @node {ASTNode} some AstNode
+ * @return {bool}
+ */
+function isLLPayableCall (node) {
+  return isMemberAccess(node,
+          exactMatch(util.escapeRegExp(lowLevelCallTypes.CALL.type)),
+          undefined, exactMatch(basicTypes.PAYABLE_ADDRESS), exactMatch(lowLevelCallTypes.CALL.ident))
 }
 
 /**
@@ -888,7 +901,7 @@ function isLLDelegatecall (node) {
 function isTransfer (node) {
   return isMemberAccess(node,
           exactMatch(util.escapeRegExp(lowLevelCallTypes.TRANSFER.type)),
-          undefined, exactMatch(basicTypes.ADDRESS), exactMatch(lowLevelCallTypes.TRANSFER.ident))
+          undefined, exactMatch(basicTypes.PAYABLE_ADDRESS), exactMatch(lowLevelCallTypes.TRANSFER.ident))
 }
 
 function isStringToBytesConversion (node) {
@@ -1048,6 +1061,7 @@ module.exports = {
   isTransfer: isTransfer,
   isLowLevelCall: isLowLevelCall,
   isLowLevelCallInst: isLLCall,
+  isLowLevelPayableCallInst: isLLPayableCall,
   isLowLevelCallcodeInst: isLLCallcode,
   isLowLevelDelegatecallInst: isLLDelegatecall,
   isLowLevelSendInst: isLLSend,
